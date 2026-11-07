@@ -1,0 +1,32 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "cn.codex.qingfengweather"
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "cn.codex.qingfengweather"
+        minSdk 26
+        targetSdk 34
+        versionCode 3
+        versionName "1.2.0"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "org.json:json:20240303"
+}
