@@ -83,7 +83,9 @@ public final class MainActivity extends Activity {
     private WeatherSnapshot snapshot;
     private LinearLayout page;
     private LinearLayout currentCard;
+    private FrameLayout currentCardContainer;
     private WeatherBackdropView backdrop;
+    private WeatherBackdropView heroBackdrop;
     private boolean dynamicBackgroundEnabled = true;
     private TextView cityLabel;
     private TextView temperatureLabel;
@@ -123,6 +125,7 @@ public final class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if (backdrop != null) backdrop.setForegroundActive(true);
+        if (heroBackdrop != null) heroBackdrop.setForegroundActive(true);
         if (!cache.isFresh(CACHE_FRESH_MILLIS)) refreshWeather(false);
         mainHandler.removeCallbacks(scheduledRefresh);
         mainHandler.postDelayed(scheduledRefresh, REFRESH_INTERVAL_MILLIS);
@@ -132,6 +135,7 @@ public final class MainActivity extends Activity {
     protected void onPause() {
         mainHandler.removeCallbacks(scheduledRefresh);
         if (backdrop != null) backdrop.setForegroundActive(false);
+        if (heroBackdrop != null) heroBackdrop.setForegroundActive(false);
         super.onPause();
     }
 
@@ -167,16 +171,24 @@ public final class MainActivity extends Activity {
         header.addView(settings, settingsParams);
         page.addView(header, matchWrap());
 
+        currentCardContainer = new FrameLayout(this);
+        currentCardContainer.setBackground(roundedGradient(
+                new int[]{Color.WHITE, Color.rgb(244, 249, 255)}, dp(26)));
+        currentCardContainer.setClipToOutline(true);
+        currentCardContainer.setElevation(dp(2));
+        heroBackdrop = new WeatherBackdropView(this);
+        heroBackdrop.setOverlayOnly(true);
+        heroBackdrop.setDynamicEnabled(dynamicBackgroundEnabled);
+        currentCardContainer.addView(heroBackdrop, new FrameLayout.LayoutParams(-1, -1));
+
         currentCard = new LinearLayout(this);
         currentCard.setOrientation(LinearLayout.VERTICAL);
         currentCard.setGravity(Gravity.CENTER_HORIZONTAL);
         currentCard.setPadding(dp(20), dp(22), dp(20), dp(20));
-        currentCard.setBackground(roundedGradient(
-                new int[]{Color.WHITE, Color.rgb(244, 249, 255)}, dp(26)));
-        currentCard.setElevation(dp(2));
+        currentCardContainer.addView(currentCard, new FrameLayout.LayoutParams(-1, -2));
         LinearLayout.LayoutParams currentParams = matchWrap();
         currentParams.topMargin = dp(14);
-        page.addView(currentCard, currentParams);
+        page.addView(currentCardContainer, currentParams);
 
         String encouragement = ENCOURAGEMENTS[new Random().nextInt(ENCOURAGEMENTS.length)];
         quoteLabel = text("“" + encouragement + "”", 14, MUTED, false);
@@ -796,7 +808,10 @@ public final class MainActivity extends Activity {
         backdrop.setDynamicEnabled(dynamicBackgroundEnabled);
         backdrop.setWeatherEffect(effect);
         int[] colors = dynamicBackgroundEnabled ? heroColors(effect) : heroColors(WeatherEffect.UNKNOWN);
-        currentCard.setBackground(roundedGradient(colors, dp(26)));
+        backdrop.setWeatherEffect(effect);
+        heroBackdrop.setDynamicEnabled(dynamicBackgroundEnabled);
+        heroBackdrop.setWeatherEffect(effect);
+        currentCardContainer.setBackground(roundedGradient(colors, dp(26)));
     }
 
     private static int[] heroColors(WeatherEffect effect) {

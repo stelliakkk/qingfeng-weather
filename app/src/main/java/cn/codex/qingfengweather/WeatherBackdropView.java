@@ -37,6 +37,7 @@ public final class WeatherBackdropView extends View {
     private WeatherEffect effect = WeatherEffect.UNKNOWN;
     private boolean dynamicEnabled = true;
     private boolean foregroundActive;
+    private boolean overlayOnly;
     private float phase;
     private long lastFrameMillis;
     private Shader backgroundShader;
@@ -75,6 +76,13 @@ public final class WeatherBackdropView extends View {
         updateAnimation();
     }
 
+    /** Draws only the weather layer, for use clipped inside the rounded current-weather card. */
+    public void setOverlayOnly(boolean value) {
+        if (overlayOnly == value) return;
+        overlayOnly = value;
+        invalidate();
+    }
+
     public void setForegroundActive(boolean active) {
         if (foregroundActive == active) return;
         foregroundActive = active;
@@ -103,10 +111,12 @@ public final class WeatherBackdropView extends View {
         int height = getHeight();
         if (width <= 0 || height <= 0) return;
         ensureShaders(width, height);
-        paint.setShader(backgroundShader);
-        paint.setAlpha(255);
-        canvas.drawRect(0, 0, width, height, paint);
-        paint.setShader(null);
+        if (!overlayOnly) {
+            paint.setShader(backgroundShader);
+            paint.setAlpha(255);
+            canvas.drawRect(0, 0, width, height, paint);
+            paint.setShader(null);
+        }
 
         if (!dynamicEnabled) return;
         switch (effect) {
@@ -115,20 +125,20 @@ public final class WeatherBackdropView extends View {
                 break;
             case PARTLY_CLOUDY:
                 drawSunGlow(canvas, width, height);
-                drawClouds(canvas, width, height, 12);
+                drawClouds(canvas, width, height, overlayOnly ? 27 : 12);
                 break;
             case CLOUDY:
-                drawClouds(canvas, width, height, 15);
+                drawClouds(canvas, width, height, overlayOnly ? 32 : 15);
                 break;
             case FOG:
                 drawFog(canvas, width, height);
                 break;
             case RAIN:
-                drawRain(canvas, width, height, 30);
+                drawRain(canvas, width, height, overlayOnly ? 82 : 30);
                 break;
             case THUNDERSTORM:
-                drawClouds(canvas, width, height, 20);
-                drawRain(canvas, width, height, 37);
+                drawClouds(canvas, width, height, overlayOnly ? 35 : 20);
+                drawRain(canvas, width, height, overlayOnly ? 92 : 37);
                 break;
             case SNOW:
                 drawSnow(canvas, width, height);
@@ -173,8 +183,8 @@ public final class WeatherBackdropView extends View {
         for (int i = 0; i < 5; i++) {
             float wave = (float) Math.sin(phase * 0.10f + i * 1.2f) * height * 0.012f;
             float y = height * (0.16f + i * 0.105f) + wave;
-            paint.setColor(Color.WHITE);
-            paint.setAlpha(27 - i % 2 * 5);
+            paint.setColor(overlayOnly ? Color.rgb(174, 193, 211) : Color.WHITE);
+            paint.setAlpha(overlayOnly ? 30 - i % 2 * 4 : 27 - i % 2 * 5);
             oval.set(-width * 0.1f, y, width * 1.1f, y + height * 0.035f);
             canvas.drawRoundRect(oval, height * 0.02f, height * 0.02f, paint);
         }
@@ -190,19 +200,20 @@ public final class WeatherBackdropView extends View {
             float x = p.x * width + (float) Math.sin(phase * 0.28f + p.seed) * width * 0.008f;
             float y = ((p.y * height + phase * height * p.speed) % (height + height * 0.08f)) - height * 0.04f;
             paint.setAlpha(Math.round(alpha * (0.55f + (p.seed % 0.45f))));
-            float length = 9f + p.size * 5f;
+            float length = getResources().getDisplayMetrics().density * (8f + p.size * 4f);
             canvas.drawLine(x, y, x + length * 0.30f, y + length, paint);
         }
         paint.setAlpha(255);
     }
 
     private void drawSnow(Canvas canvas, int width, int height) {
-        paint.setColor(Color.WHITE);
+        paint.setColor(Color.rgb(142, 182, 214));
+        float density = getResources().getDisplayMetrics().density;
         for (Particle p : particles) {
             float x = p.x * width + (float) Math.sin(phase * 0.5f + p.seed) * width * 0.012f;
             float y = ((p.y * height + phase * height * p.speed * 0.30f) % (height + 12f)) - 6f;
-            paint.setAlpha(75 + Math.round((p.seed % 1f) * 70));
-            canvas.drawCircle(x, y, p.size * 1.5f, paint);
+            paint.setAlpha(85 + Math.round((p.seed % 1f) * 70));
+            canvas.drawCircle(x, y, density * (1.2f + p.size), paint);
         }
         paint.setAlpha(255);
     }
