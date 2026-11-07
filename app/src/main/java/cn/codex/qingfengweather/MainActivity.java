@@ -14,9 +14,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +35,8 @@ import cn.codex.qingfengweather.data.QWeatherProvider;
 import cn.codex.qingfengweather.data.RefreshResult;
 import cn.codex.qingfengweather.data.WeatherAlert;
 import cn.codex.qingfengweather.data.WeatherCache;
+import cn.codex.qingfengweather.data.WeatherEffect;
+import cn.codex.qingfengweather.data.WeatherEffectResolver;
 import cn.codex.qingfengweather.data.WeatherIndex;
 import cn.codex.qingfengweather.data.WeatherRepository;
 import cn.codex.qingfengweather.data.WeatherSnapshot;
@@ -51,6 +55,8 @@ public final class MainActivity extends Activity {
     private static final int BLUE = Color.rgb(39, 99, 173);
     private static final int INK = Color.rgb(31, 48, 70);
     private static final int MUTED = Color.rgb(111, 128, 148);
+    private static final String UI_PREFERENCES = "weather_ui_settings";
+    private static final String PREF_DYNAMIC_WEATHER = "dynamic_weather_enabled";
     private static final long REFRESH_INTERVAL_MILLIS = 30 * 60 * 1000L;
     private static final long CACHE_FRESH_MILLIS = REFRESH_INTERVAL_MILLIS;
     private static final String[] ENCOURAGEMENTS = {
@@ -76,6 +82,9 @@ public final class MainActivity extends Activity {
     private City city;
     private WeatherSnapshot snapshot;
     private LinearLayout page;
+    private LinearLayout currentCard;
+    private WeatherBackdropView backdrop;
+    private boolean dynamicBackgroundEnabled = true;
     private TextView cityLabel;
     private TextView temperatureLabel;
     private TextView conditionLabel;
@@ -100,6 +109,8 @@ public final class MainActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         cache = new WeatherCache(this);
+        dynamicBackgroundEnabled = getSharedPreferences(UI_PREFERENCES, MODE_PRIVATE)
+                .getBoolean(PREF_DYNAMIC_WEATHER, true);
         city = cache.getCity();
         if (city == null) city = new City("北京", "北京市", "中国", 39.9042, 116.4074, "Asia/Shanghai");
         snapshot = cache.getSnapshot();
@@ -111,6 +122,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (backdrop != null) backdrop.setForegroundActive(true);
         if (!cache.isFresh(CACHE_FRESH_MILLIS)) refreshWeather(false);
         mainHandler.removeCallbacks(scheduledRefresh);
         mainHandler.postDelayed(scheduledRefresh, REFRESH_INTERVAL_MILLIS);
@@ -119,6 +131,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onPause() {
         mainHandler.removeCallbacks(scheduledRefresh);
+        if (backdrop != null) backdrop.setForegroundActive(false);
         super.onPause();
     }
 
@@ -133,7 +146,7 @@ public final class MainActivity extends Activity {
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(true);
         scroll.setClipToPadding(false);
-        scroll.setBackgroundColor(Color.rgb(242, 246, 252));
+        scroll.setBackgroundColor(Color.TRANSPARENT);
         page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setPadding(dp(20), dp(18), dp(20), dp(28));
@@ -154,22 +167,22 @@ public final class MainActivity extends Activity {
         header.addView(settings, settingsParams);
         page.addView(header, matchWrap());
 
-        LinearLayout current = new LinearLayout(this);
-        current.setOrientation(LinearLayout.VERTICAL);
-        current.setGravity(Gravity.CENTER_HORIZONTAL);
-        current.setPadding(dp(20), dp(22), dp(20), dp(20));
-        current.setBackground(roundedGradient(
+        currentCard = new LinearLayout(this);
+        currentCard.setOrientation(LinearLayout.VERTICAL);
+        currentCard.setGravity(Gravity.CENTER_HORIZONTAL);
+        currentCard.setPadding(dp(20), dp(22), dp(20), dp(20));
+        currentCard.setBackground(roundedGradient(
                 new int[]{Color.WHITE, Color.rgb(244, 249, 255)}, dp(26)));
-        current.setElevation(dp(2));
+        currentCard.setElevation(dp(2));
         LinearLayout.LayoutParams currentParams = matchWrap();
         currentParams.topMargin = dp(14);
-        page.addView(current, currentParams);
+        page.addView(currentCard, currentParams);
 
         String encouragement = ENCOURAGEMENTS[new Random().nextInt(ENCOURAGEMENTS.length)];
         quoteLabel = text("“" + encouragement + "”", 14, MUTED, false);
         quoteLabel.setGravity(Gravity.CENTER);
         quoteLabel.setMaxLines(2);
-        current.addView(quoteLabel, matchWrap());
+        currentCard.addView(quoteLabel, matchWrap());
 
         temperatureLabel = text("--°", 82, INK, false);
         temperatureLabel.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
@@ -178,24 +191,24 @@ public final class MainActivity extends Activity {
         temperatureLabel.setMinWidth(dp(210));
         LinearLayout.LayoutParams tempParams = new LinearLayout.LayoutParams(-1, dp(122));
         tempParams.topMargin = dp(7);
-        current.addView(temperatureLabel, tempParams);
+        currentCard.addView(temperatureLabel, tempParams);
         conditionLabel = text("等待天气数据", 19, INK, true);
         conditionLabel.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams conditionParams = wrap();
         conditionParams.topMargin = -dp(5);
-        current.addView(conditionLabel, conditionParams);
+        currentCard.addView(conditionLabel, conditionParams);
         detailsLabel = text("体感 --°    湿度 --%\n风速 -- km/h    降水 -- mm", 14, MUTED, false);
         detailsLabel.setGravity(Gravity.CENTER);
         detailsLabel.setLineSpacing(dp(7), 1.0f);
         LinearLayout.LayoutParams detailParams = wrap();
         detailParams.topMargin = dp(18);
-        current.addView(detailsLabel, detailParams);
+        currentCard.addView(detailsLabel, detailParams);
 
         LinearLayout updateRow = new LinearLayout(this);
         updateRow.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams rowParams = matchWrap();
         rowParams.topMargin = dp(17);
-        current.addView(updateRow, rowParams);
+        currentCard.addView(updateRow, rowParams);
         updatedLabel = text("尚未更新", 12, MUTED, false);
         updatedLabel.setGravity(Gravity.CENTER);
         updateRow.addView(updatedLabel, matchWrap());
@@ -204,7 +217,7 @@ public final class MainActivity extends Activity {
         messageLabel.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams messageParams = matchWrap();
         messageParams.topMargin = dp(10);
-        current.addView(messageLabel, messageParams);
+        currentCard.addView(messageLabel, messageParams);
 
         alertCard = cardLayout();
         LinearLayout.LayoutParams alertParams = matchWrap();
@@ -291,13 +304,20 @@ public final class MainActivity extends Activity {
         swipeRefresh = new SwipeRefreshLayout(this);
         swipeRefresh.setColorSchemeColors(BLUE, Color.rgb(90, 154, 218));
         swipeRefresh.setProgressBackgroundColorSchemeColor(Color.WHITE);
+        swipeRefresh.setBackgroundColor(Color.TRANSPARENT);
         swipeRefresh.setOnRefreshListener(() -> refreshWeather(true));
         swipeRefresh.addView(scroll, new SwipeRefreshLayout.LayoutParams(-1, -1));
-        setContentView(swipeRefresh);
+        backdrop = new WeatherBackdropView(this);
+        backdrop.setDynamicEnabled(dynamicBackgroundEnabled);
+        FrameLayout root = new FrameLayout(this);
+        root.addView(backdrop, new FrameLayout.LayoutParams(-1, -1));
+        root.addView(swipeRefresh, new FrameLayout.LayoutParams(-1, -1));
+        setContentView(root);
     }
 
     private void render() {
         cityLabel.setText(city.displayName());
+        updateWeatherBackdrop();
         if (snapshot == null) {
             temperatureLabel.setText("--°");
             conditionLabel.setText("天气数据加载中");
@@ -696,6 +716,18 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams keyParams = matchWrap();
         keyParams.topMargin = dp(6);
         form.addView(key, keyParams);
+        Switch dynamicToggle = new Switch(this);
+        dynamicToggle.setText("动态天气背景");
+        dynamicToggle.setTextSize(14);
+        dynamicToggle.setTextColor(INK);
+        dynamicToggle.setChecked(dynamicBackgroundEnabled);
+        LinearLayout.LayoutParams toggleParams = matchWrap();
+        toggleParams.topMargin = dp(12);
+        form.addView(dynamicToggle, toggleParams);
+        TextView dynamicHint = text("按天气显示轻柔的背景动效，也可以随时关闭。", 12, MUTED, false);
+        LinearLayout.LayoutParams dynamicHintParams = matchWrap();
+        dynamicHintParams.topMargin = dp(3);
+        form.addView(dynamicHint, dynamicHintParams);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("天气服务设置")
                 .setView(form)
@@ -713,11 +745,21 @@ public final class MainActivity extends Activity {
                 }
                 if (!hostValue.isEmpty() && keyValue.isEmpty()) keyValue = saved.apiKey;
                 if (hostValue.isEmpty()) keyValue = "";
+                boolean credentialsChanged = !hostValue.equals(saved.host) || !keyValue.equals(saved.apiKey);
                 try {
                     CredentialStore.save(this, hostValue, keyValue);
+                    dynamicBackgroundEnabled = dynamicToggle.isChecked();
+                    getSharedPreferences(UI_PREFERENCES, MODE_PRIVATE).edit()
+                            .putBoolean(PREF_DYNAMIC_WEATHER, dynamicBackgroundEnabled).apply();
+                    if (backdrop != null) backdrop.setDynamicEnabled(dynamicBackgroundEnabled);
+                    updateWeatherBackdrop();
                     dialog.dismiss();
-                    setMessage(keyValue.isEmpty() ? "已设置为 Open-Meteo 天气源" : "和风天气配置已保存");
-                    refreshWeather(true);
+                    if (credentialsChanged) {
+                        setMessage(keyValue.isEmpty() ? "已设置为 Open-Meteo 天气源" : "和风天气配置已保存");
+                        refreshWeather(true);
+                    } else {
+                        setMessage("显示设置已保存");
+                    }
                 } catch (Exception e) {
                     Toast.makeText(this, "无法安全保存密钥，请重试", Toast.LENGTH_LONG).show();
                 }
@@ -725,6 +767,11 @@ public final class MainActivity extends Activity {
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
                 try {
                     CredentialStore.save(this, "", "");
+                    dynamicBackgroundEnabled = dynamicToggle.isChecked();
+                    getSharedPreferences(UI_PREFERENCES, MODE_PRIVATE).edit()
+                            .putBoolean(PREF_DYNAMIC_WEATHER, dynamicBackgroundEnabled).apply();
+                    if (backdrop != null) backdrop.setDynamicEnabled(dynamicBackgroundEnabled);
+                    updateWeatherBackdrop();
                     dialog.dismiss();
                     setMessage("已清除和风配置，将使用 Open-Meteo");
                     refreshWeather(true);
@@ -739,6 +786,43 @@ public final class MainActivity extends Activity {
 
     private void setMessage(String text) {
         if (messageLabel != null) messageLabel.setText(text == null ? "" : text);
+    }
+
+    private void updateWeatherBackdrop() {
+        if (backdrop == null || currentCard == null) return;
+        WeatherEffect effect = snapshot == null
+                ? WeatherEffect.UNKNOWN
+                : WeatherEffectResolver.resolve(snapshot.condition);
+        backdrop.setDynamicEnabled(dynamicBackgroundEnabled);
+        backdrop.setWeatherEffect(effect);
+        int[] colors = dynamicBackgroundEnabled ? heroColors(effect) : heroColors(WeatherEffect.UNKNOWN);
+        currentCard.setBackground(roundedGradient(colors, dp(26)));
+    }
+
+    private static int[] heroColors(WeatherEffect effect) {
+        int first;
+        int second;
+        switch (effect) {
+            case SUNNY:
+                first = Color.rgb(255, 253, 247); second = Color.rgb(255, 250, 239); break;
+            case PARTLY_CLOUDY:
+                first = Color.rgb(250, 253, 255); second = Color.rgb(244, 249, 255); break;
+            case CLOUDY:
+                first = Color.rgb(250, 252, 254); second = Color.rgb(242, 247, 251); break;
+            case FOG:
+                first = Color.rgb(251, 253, 253); second = Color.rgb(244, 248, 249); break;
+            case RAIN:
+                first = Color.rgb(247, 251, 255); second = Color.rgb(239, 247, 253); break;
+            case THUNDERSTORM:
+                first = Color.rgb(246, 250, 255); second = Color.rgb(237, 243, 251); break;
+            case SNOW:
+                first = Color.rgb(252, 254, 255); second = Color.rgb(243, 249, 255); break;
+            case UNKNOWN:
+            default:
+                first = Color.WHITE; second = Color.rgb(244, 249, 255); break;
+        }
+        return new int[]{Color.argb(235, Color.red(first), Color.green(first), Color.blue(first)),
+                Color.argb(235, Color.red(second), Color.green(second), Color.blue(second))};
     }
 
     private static String formatTemp(double value) {
