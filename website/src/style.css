@@ -135,8 +135,18 @@ h2 { font-size: clamp(2rem, 4vw, 3.65rem); }
     linear-gradient(90deg, #12282073, transparent 68%);
 }
 .weather-atmosphere { z-index: -2; opacity: 0; transition: opacity .8s ease; }
-[data-weather="sun"] .weather-atmosphere { background: radial-gradient(ellipse at 77% 6%, #ffe6ae83, transparent 52%); opacity: .7; }
-[data-weather="cloud"] .weather-atmosphere { background: radial-gradient(ellipse at 65% 5%, #e6e9e88a, transparent 65%); opacity: .72; }
+[data-weather="sun"] .weather-atmosphere {
+  background: radial-gradient(ellipse 42% 9% at 76% 17%, #fff8e590, transparent),
+    radial-gradient(ellipse 36% 6% at 46% 10%, #fff8e56e, transparent),
+    radial-gradient(ellipse at 77% 6%, #ffe6ae83, transparent 52%);
+  opacity: .7;
+}
+[data-weather="cloud"] .weather-atmosphere {
+  background: radial-gradient(ellipse 48% 11% at 76% 15%, #d1dbd491, transparent),
+    radial-gradient(ellipse 42% 10% at 36% 22%, #bbc7c5a6, transparent),
+    radial-gradient(ellipse at 65% 5%, #e6e9e88a, transparent 65%);
+  opacity: .72;
+}
 [data-weather="fog"] .weather-atmosphere { background: radial-gradient(ellipse at 42% 58%, #e5ede2bf, transparent 62%), radial-gradient(ellipse at 85% 72%, #e5ede28c, transparent 56%); opacity: .75; }
 [data-weather="rain"] .weather-atmosphere { background: #27453f; opacity: .24; }
 .experience.is-visible .weather-atmosphere { animation: drift 21s ease-in-out infinite alternate; }
