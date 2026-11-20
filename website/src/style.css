@@ -251,6 +251,9 @@ footer { background: #f1f4ed; }
 }
 .gallery-details .shot { height: clamp(172px, 18vw, 250px); }
 .gallery-details .shot img { align-self: center; margin-top: 0; width: min(82%, 246px); }
+@media (min-width: 768px) {
+  .gallery-details figure:first-child .shot img { width: min(78%, 220px); transform: translateY(5px); }
+}
 @media (max-width: 767px) {
   .gallery-details { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem .65rem; margin-top: 1.4rem; }
   .gallery-details .shot img { width: 96%; transform: translateY(9px); }
