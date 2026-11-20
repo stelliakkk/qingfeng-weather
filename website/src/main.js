@@ -78,17 +78,16 @@ new ResizeObserver(() => rain.style.setProperty('--fall-distance', (scene.client
 const lightbox = document.querySelector('.lightbox');
 const enlarged = lightbox.querySelector('img');
 const lightboxTitle = lightbox.querySelector('h2');
-let openedFrom;
 
 document.querySelectorAll('.shot').forEach(link => {
   link.addEventListener('click', event => {
     if (!lightbox.showModal || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     const caption = link.parentElement.querySelector('figcaption strong');
-    openedFrom = link;
     lightboxTitle.textContent = caption.textContent;
     enlarged.alt = link.querySelector('img').alt;
     enlarged.src = link.href;
+    link.focus({ preventScroll: true });
     lightbox.showModal();
   });
 });
@@ -98,8 +97,4 @@ lightbox.addEventListener('click', event => {
   const bounds = lightbox.getBoundingClientRect();
   if (event.clientX < bounds.left || event.clientX > bounds.right
     || event.clientY < bounds.top || event.clientY > bounds.bottom) lightbox.close();
-});
-lightbox.addEventListener('close', () => {
-  enlarged.removeAttribute('src');
-  openedFrom?.focus();
 });
