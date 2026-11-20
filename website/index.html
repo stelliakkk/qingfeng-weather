@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f4">
+  <title>清风天气 — 天气，清楚一点。生活，从容一点。</title>
+  <meta name="description" content="清风天气是一款无广告的开源 Android 天气应用，提供天气实况、24 小时与 7 天预报。">
+  <link rel="canonical" href="https://stelliakkk.github.io/qingfeng-weather/">
+  <link rel="icon" href="%BASE_URL%brand.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:site_name" content="清风天气">
+  <meta property="og:title" content="清风天气 — 天气，清楚一点。生活，从容一点。">
+  <meta property="og:description" content="一款简洁、无广告的开源 Android 天气应用。">
+  <meta property="og:url" content="https://stelliakkk.github.io/qingfeng-weather/">
+  <meta property="og:image" content="https://stelliakkk.github.io/qingfeng-weather/media/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="雨后山湖薄雾中的清风天气品牌封面">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="/src/style.css">
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body id="top">
+  <a class="skip" href="#main">跳至主要内容</a>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 .8a11.2 11.2 0 0 0-3.54 21.83c.56.1.77-.24.77-.54v-2.09c-3.12.68-3.78-1.32-3.78-1.32-.51-1.29-1.24-1.63-1.24-1.63-1.02-.7.08-.69.08-.69 1.13.08 1.72 1.15 1.72 1.15 1 1.71 2.62 1.22 3.26.93.1-.72.39-1.22.71-1.5-2.49-.28-5.11-1.25-5.11-5.54 0-1.22.44-2.23 1.15-3.01-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.08 1.15a10.75 10.75 0 0 1 5.6 0C16.95 5.13 17.89 5.43 17.89 5.43c.61 1.54.23 2.68.11 2.96.72.78 1.15 1.79 1.15 3.01 0 4.3-2.62 5.26-5.12 5.53.4.35.76 1.03.76 2.08v3.08c0 .3.2.65.77.54A11.2 11.2 0 0 0 12 .8Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18h11a3.5 3.5 0 0 0 .2-7 6 6 0 0 0-11.4-1A4 4 0 0 0 7 18Z"/></symbol>
+    <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 15h11a3.5 3.5 0 0 0 .2-7 6 6 0 0 0-11.4-1A4 4 0 0 0 7 15Zm1 3-1.5 3m6-3L11 21m6-3-1.5 3"/></symbol>
+    <symbol id="i-fog" viewBox="0 0 24 24"><path d="M4 11h16M6 15h12M4 19h16m-13-8a5 5 0 0 1 9.5 0"/></symbol>
+    <symbol id="i-temp" viewBox="0 0 24 24"><path d="M9 14.2V5a3 3 0 0 1 6 0v9.2a5 5 0 1 1-6 0ZM12 10v8"/><circle cx="12" cy="18" r="1.5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-14 5h3m4 0h3"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M11 4 3 18a1.3 1.3 0 0 0 1.1 2h15.8a1.3 1.3 0 0 0 1.1-2L13 4a1.2 1.2 0 0 0-2 0Zm1 5v4m0 3.5v.1"/></symbol>
+    <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 10h13a3 3 0 1 0-3-3M3 14h16a2 2 0 1 1-2 2M5 18h7"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19C1 9 10 6 20 4c0 10-4 16-13 15M4 21l10-10"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M14 4h6v6m0-6-6 6m-4 10H4v-6m0 6 6-6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="主导航">
+      <a class="brand" href="#top"><img src="%BASE_URL%brand.svg" width="38" height="38" alt=""><span>清风天气<small lang="en">QINGFENG WEATHER</small></span></a>
+      <div class="nav-links">
+        <a href="#features">功能</a><a href="#experience">天气体验</a><a href="#screens">应用界面</a><a href="#about">关于项目</a>
+      </div>
+      <a class="nav-repo" href="https://github.com/stelliakkk/qingfeng-weather"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <picture class="backdrop">
+        <source media="(max-width: 767px)" srcset="%BASE_URL%media/dawn-mobile.webp">
+        <img src="%BASE_URL%media/dawn.webp" alt="" fetchpriority="high" width="1920" height="1080">
+      </picture>
+      <div class="hero-shade"></div>
+      <div class="hero-inner wrap">
+        <div class="hero-copy">
+          <div class="eyebrow hero-eyebrow"><span lang="en">AIR &amp; LIGHT</span><span class="eyebrow-rule"></span><span>风有形，天气有温度</span></div>
+          <h1 id="hero-title">天气，清楚一点。<br><span>生活，从容一点。</span></h1>
+          <p>清风天气，一款简洁、无广告的 Android 天气应用。了解天气变化，查看未来预报，让每一天的出行更有准备。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/stelliakkk/qingfeng-weather"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>在 GitHub 上查看</a>
+            <a class="button secondary" href="#features">探索清风天气</a>
+          </div>
+        </div>
+        <figure class="hero-device">
+          <div class="phone"><img src="%BASE_URL%media/app-home.webp" alt="清风天气首页的实况天气、数据来源和摘要卡片" width="432" height="960" fetchpriority="high"></div>
+          <figcaption><span></span>Android 应用实拍 · 示例数据</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section wrap" id="features" aria-labelledby="feature-title">
+      <div class="section-intro">
+        <div><p class="eyebrow" lang="en">MADE FOR EVERY DAY</p><h2 id="feature-title">每天的天气，<br class="only-small">都值得认真对待。</h2></div>
+        <p>从出门那一刻，到接下来的一周。<br>把日常需要的天气信息放在一起。</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature lead">
+          <svg class="icon feature-icon" aria-hidden="true"><use href="#i-temp"/></svg>
+          <h3>当前天气与体感</h3><p>查看气温、体感温度、湿度、风速和降水。</p>
+          <div class="feature-now" aria-label="实况展示示例：21 度，体感 22 度"><span>21°</span><span>体感 22°<br><small>示例数据</small></span></div>
+        </article>
+        <article class="feature hourly">
+          <svg class="icon feature-icon" aria-hidden="true"><use href="#i-sun"/></svg>
+          <h3>24 小时逐小时预报</h3><p>看看温度与降水概率如何变化。</p>
+          <figure class="hour-chart">
+            <div class="plot" aria-hidden="true"><svg viewBox="0 0 360 65" preserveAspectRatio="none"><path d="M0 50 C52 50 74 30 120 24S200 7 240 18 306 42 360 38"/></svg></div>
+            <div class="hours" aria-label="示例：8 时 17 度，11 时 21 度，14 时 23 度，17 时 20 度"><span>08:00</span><span>11:00</span><span>14:00</span><span>17:00</span></div>
+            <figcaption>示例趋势</figcaption>
+          </figure>
+        </article>
+        <article class="feature compact"><svg class="icon feature-icon" aria-hidden="true"><use href="#i-calendar"/></svg><h3>7 天预报</h3><p>提前查看每天的天气状况及高低温。</p></article>
+        <article class="feature compact"><svg class="icon feature-icon" aria-hidden="true"><use href="#i-alert"/></svg><h3>天气预警</h3><p>查看生效中的预警详情和防御建议。</p></article>
+        <article class="feature compact"><svg class="icon feature-icon" aria-hidden="true"><use href="#i-wind"/></svg><h3>空气质量</h3><p>了解 AQI、主要污染物及健康提示。</p></article>
+        <article class="feature compact"><svg class="icon feature-icon" aria-hidden="true"><use href="#i-leaf"/></svg><h3>生活指数</h3><p>参考穿衣、运动、洗车等日常建议。</p></article>
+      </div>
+      <p class="feature-note">预警、空气质量与生活指数依赖和风天气的配置和服务可用性。</p>
+    </section>
+
+    <section class="experience" id="experience" aria-labelledby="weather-title" data-weather="sun">
+      <div class="weather-photos" aria-hidden="true">
+        <picture class="backdrop photo active" data-photo="sun"><source media="(max-width: 767px)" srcset="%BASE_URL%media/sun-mobile.webp"><img src="%BASE_URL%media/sun.webp" alt="" width="1600" height="1000" loading="lazy"></picture>
+      </div>
+      <div class="weather-light" aria-hidden="true"></div><div class="weather-atmosphere" aria-hidden="true"></div><div class="rain" aria-hidden="true"></div>
+      <div class="experience-inner wrap">
+        <div><p class="eyebrow" lang="en">WEATHER IN MOTION</p><h2 id="weather-title">天气会变化，<br>界面也会呼吸。</h2></div>
+        <div class="weather-console">
+          <div class="weather-caption"><p>天气效果演示</p><span>静态场景 · 非实时天气</span></div>
+          <div class="weather-options" role="group" aria-label="切换天气效果">
+            <button type="button" aria-pressed="true" data-mode="sun"><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg>晴</button>
+            <button type="button" aria-pressed="false" data-mode="cloud"><svg class="icon" aria-hidden="true"><use href="#i-cloud"/></svg>阴</button>
+            <button type="button" aria-pressed="false" data-mode="rain"><svg class="icon" aria-hidden="true"><use href="#i-rain"/></svg>雨</button>
+            <button type="button" aria-pressed="false" data-mode="fog"><svg class="icon" aria-hidden="true"><use href="#i-fog"/></svg>雾</button>
+          </div>
+          <p class="weather-message" role="status">晴 · 暖光穿过轻云，在湖面铺开。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap gallery-section" id="screens" aria-labelledby="screens-title">
+      <div class="section-intro">
+        <div><p class="eyebrow" lang="en">CLOSER LOOK</p><h2 id="screens-title">重要的信息，<br class="only-small">恰到好处。</h2></div>
+        <p>Android 模拟器实拍，天气为示例数据。<br>选择截图可放大查看。</p>
+      </div>
+      <div class="gallery">
+        <figure class="gallery-main">
+          <a class="shot" href="%BASE_URL%media/app-home.webp"><img src="%BASE_URL%media/app-home.webp" alt="清风天气首页，顶部是当前城市与天气实况，下方是预警、空气质量和生活指数摘要" width="432" height="960" loading="lazy"><span class="zoom"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></span></a>
+          <figcaption><strong>天气首页</strong><span>城市、体感与天气摘要</span></figcaption>
+        </figure>
+        <div class="gallery-side">
+          <figure class="gallery-wide">
+            <a class="shot" href="%BASE_URL%media/app-forecast.webp"><img src="%BASE_URL%media/app-forecast.webp" alt="首页下半部，展示逐小时温度、降水概率和七天预报" width="432" height="960" loading="lazy"><span class="zoom"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></span></a>
+            <figcaption><strong>短期与一周预报</strong><span>未来 24 小时与 7 天</span></figcaption>
+          </figure>
+          <figure>
+            <a class="shot" href="%BASE_URL%media/app-city.webp"><img src="%BASE_URL%media/app-city.webp" alt="清风天气城市搜索对话框" width="432" height="960" loading="lazy"><span class="zoom"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></span></a>
+            <figcaption><strong>城市搜索</strong></figcaption>
+          </figure>
+          <figure>
+            <a class="shot" href="%BASE_URL%media/app-settings.webp"><img src="%BASE_URL%media/app-settings.webp" alt="天气服务配置和动态天气背景开关" width="432" height="960" loading="lazy"><span class="zoom"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></span></a>
+            <figcaption><strong>应用设置</strong></figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="gallery-details" aria-label="天气详情截图">
+        <figure>
+          <a class="shot" href="%BASE_URL%media/app-alert.webp"><img src="%BASE_URL%media/app-alert.webp" alt="清风天气预警对话框，显示示例大风预警和防御建议" width="432" height="960" loading="lazy"><span class="zoom"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></span></a>
+          <figcaption><strong>预警详情</strong></figcaption>
+        </figure>
+        <figure>
+          <a class="shot" href="%BASE_URL%media/app-air.webp"><img src="%BASE_URL%media/app-air.webp" alt="清风天气空气质量对话框，显示示例 AQI、颗粒物及健康提示" width="432" height="960" loading="lazy"><span class="zoom"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></span></a>
+          <figcaption><strong>空气质量</strong></figcaption>
+        </figure>
+        <figure>
+          <a class="shot" href="%BASE_URL%media/app-indices.webp"><img src="%BASE_URL%media/app-indices.webp" alt="清风天气生活指数对话框，显示示例穿衣、运动和洗车建议" width="432" height="960" loading="lazy"><span class="zoom"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></span></a>
+          <figcaption><strong>生活指数</strong></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="details" id="about" aria-labelledby="about-title">
+      <div class="section wrap details-inner">
+        <div><p class="eyebrow" lang="en">THOUGHTFUL DETAILS</p><h2 id="about-title">简单，<br>藏在每一个细节里。</h2><p>清风天气把空间留给天气，把选择留给你。</p></div>
+        <dl>
+          <div><dt>无广告，界面简洁</dt><dd>打开首页就能查看实况，向下滑动继续看预报。</dd></div>
+          <div><dt>由你选择城市</dt><dd>手动搜索并选择城市，应用无需定位权限。</dd></div>
+          <div><dt>打开就能看到上次天气</dt><dd>有本地缓存时，应用先显示已有天气，再按需联网更新。</dd></div>
+          <div><dt>动静随心</dt><dd>动态天气背景可以在应用设置中关闭。</dd></div>
+          <div><dt>和风天气与 Open-Meteo</dt><dd>配置和风天气后优先使用和风服务。未配置或核心请求失败时，由 Open-Meteo 提供基础实况和预报。数据取决于外部服务与应用内配置。</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <picture class="backdrop"><source media="(max-width: 767px)" srcset="%BASE_URL%media/dusk-mobile.webp"><img src="%BASE_URL%media/dusk.webp" alt="" width="1600" height="1000" loading="lazy"></picture>
+      <div class="closing-shade"></div>
+      <div class="wrap closing-inner">
+        <p class="eyebrow" lang="en">A CLEARER TOMORROW</p>
+        <h2 id="closing-title">愿每一次抬头，<br class="only-small">都有好天气。</h2>
+        <p>清风天气是一个持续完善的个人开源 Android 天气项目。</p>
+        <a class="button light" href="https://github.com/stelliakkk/qingfeng-weather"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>在 GitHub 上查看</a>
+        <p class="version">v1.3.1 · Android 8.0+ · Debug 签名个人测试版</p>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap footer-inner"><span>清风天气 <span aria-hidden="true">/</span> <span lang="en">Qingfeng Weather</span></span><span lang="en">Created by stelliakkk</span><a href="https://github.com/stelliakkk/qingfeng-weather">GitHub 仓库</a></div></footer>
+
+  <dialog class="lightbox" aria-labelledby="lightbox-title">
+    <div class="lightbox-header"><h2 id="lightbox-title">应用截图</h2><form method="dialog"><button type="submit" aria-label="关闭截图" autofocus><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></form></div>
+    <img alt="">
+  </dialog>
+</body>
+</html>
